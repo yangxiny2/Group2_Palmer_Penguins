@@ -1,0 +1,7 @@
+
+
+<!-- Note: Section files must have no YAML header and only Report.qmd should have one. 
+# If you have trouble compiling, try Create with File → New File → Text File (not Quarto Document, which inserts a header)
+# Save with a .qmd file -->
+
+Intro
