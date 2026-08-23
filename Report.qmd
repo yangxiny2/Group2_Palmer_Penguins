@@ -1,0 +1,13 @@
+---
+title: "Palmer Penguins"
+format: pdf
+editor: visual
+bibliography: bibliography.bib
+execute: 
+  echo: false
+---
+
+
+# Introduction
+
+{{< include Introduction.qmd >}}
