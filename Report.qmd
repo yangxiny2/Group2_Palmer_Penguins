@@ -11,3 +11,15 @@ execute:
 # Introduction
 
 {{< include Introduction.qmd >}}
+
+# Methods
+
+{{< include P3_methods.qmd >}}
+
+# Results
+
+{{< include P3_results.qmd >}}
+
+# Discussion
+
+{{< include P3_Discussion.qmd >}}
