@@ -1,6 +1,3 @@
-
-## Results
-
 Part 1: Sex difference within species
 
 F-test:
