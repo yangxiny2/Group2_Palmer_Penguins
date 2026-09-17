@@ -1,8 +1,3 @@
-
- 
-## Discussion
- 
- 
 Our tests provide strong evidence for Part 1 - that males and females penguins differ significantly in size within each species. We examined individual measurements (t-tests), all measurements considered together (Hotelling's T²) and the covariance structure (Box's M), which showed that not only do the average measurements differ by sex, but the way the measurements relate to one another. For covariance structure, Adelie differed from the other species. While the means for Adelie had a significant difference, its covariance shape did not differ significantly between sexes (p = 0.061), suggesting Adelie males and females vary in a more similar way than for males and females of Gentoo or Chinstrap species.
  
 Our analysis also shows in Part 2 that sex has a visible and clear effect on species classification. In the model without distinction for sex, penguins 68, 124, 286, and 296 were misclassified; however, in the model with sex considered, these individuals are no longer misclassified - although penguin 274 then becomes misclassified.
