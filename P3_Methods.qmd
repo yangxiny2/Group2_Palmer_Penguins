@@ -1,0 +1,594 @@
+
+## Methods
+
+To answer the question, we broke down the question into 2 parts: 
+
+1) Do size differences within females and males penguins in one species, cause misclassification for another species; and 
+
+2) Does removing and then adding sex change misclassification?
+
+
+## Part 1: Sex differences within species
+
+For the dataset, we dropped penguins with no sex to ensure consistency of the data and added a row_id column to help us analyse penguins at an individual level. 
+
+
+```{r}
+#| echo: false
+#| eval: true
+palmer_penguins <- read.csv("penguins_cleaned.csv")
+
+palmer_penguins$row_id <- 1:nrow(palmer_penguins)
+
+#load as factor
+palmer_penguins$species <- as.factor(palmer_penguins$species)
+palmer_penguins$sex <- as.factor(palmer_penguins$sex)
+
+```
+
+
+The goal was to perform a t-test to confirm whether a significant difference exists between the mean measurements within each species accounting for both males and females. This approach follows R code demonstrated in the STAT394 lecture (Frery, 2026).
+
+However, the t-test assumes equal variances so we elected to first perform an f-test to determine whether males and females within each species have the same spread. Results shown below.
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| results: 'hide'
+
+#Adelie
+
+#bill_length_mm
+adelie_m <- subset(palmer_penguins, species=="Adelie" & sex=="male")$bill_length_mm
+adelie_f <- subset(palmer_penguins, species=="Adelie" & sex=="female")$bill_length_mm
+var.test(adelie_m, adelie_f, alternative = "two.sided")
+
+#p-value = 0.3296
+
+
+#bill_depth_mm
+adelie_m <- subset(palmer_penguins, species=="Adelie" & sex=="male")$bill_depth_mm
+adelie_f <- subset(palmer_penguins, species=="Adelie" & sex=="female")$bill_depth_mm
+var.test(adelie_m, adelie_f, alternative = "two.sided")
+
+#p-value = 0.513
+
+#flipper_length_mm
+adelie_m <- subset(palmer_penguins, species=="Adelie" & sex=="male")$flipper_length_mm
+adelie_f <- subset(palmer_penguins, species=="Adelie" & sex=="female")$flipper_length_mm
+var.test(adelie_m, adelie_f, alternative = "two.sided")
+
+#p-value = 0.1637
+
+#body_mass_g
+adelie_m <- subset(palmer_penguins, species=="Adelie" & sex=="male")$body_mass_g
+adelie_f <- subset(palmer_penguins, species=="Adelie" & sex=="female")$body_mass_g
+var.test(adelie_m, adelie_f, alternative = "two.sided")
+
+#p-value = 0.03356
+ 
+  
+#Gentoo
+
+
+#bill_length_mm
+gentoo_m <- subset(palmer_penguins, species=="Gentoo" & sex=="male")$bill_length_mm
+gentoo_f <- subset(palmer_penguins, species=="Gentoo" & sex=="female")$bill_length_mm
+var.test(gentoo_m, gentoo_f, alternative = "two.sided")
+
+#p-value = 0.03327
+
+#bill_depth_mm
+gentoo_m <- subset(palmer_penguins, species=="Gentoo" & sex=="male")$bill_depth_mm
+gentoo_f <- subset(palmer_penguins, species=="Gentoo" & sex=="female")$bill_depth_mm
+var.test(gentoo_m, gentoo_f, alternative = "two.sided")
+
+#p-value = 0.0174
+
+
+#flipper_length_mm
+gentoo_m <- subset(palmer_penguins, species=="Gentoo" & sex=="male")$flipper_length_mm
+gentoo_f <- subset(palmer_penguins, species=="Gentoo" & sex=="female")$flipper_length_mm
+
+var.test(gentoo_m, gentoo_f, alternative = "two.sided")
+
+#p-value = 0.004889
+
+
+#body_mass_g
+gentoo_m <- subset(palmer_penguins, species=="Gentoo" & sex=="male")$body_mass_g
+gentoo_f <- subset(palmer_penguins, species=="Gentoo" & sex=="female")$body_mass_g
+
+var.test(gentoo_m, gentoo_f, alternative = "two.sided")
+
+#p-value = 0.4205
+ 
+
+#Chinstrap
+  
+#bill_length_mm
+chinstrap_m <- subset(palmer_penguins, species=="Chinstrap" & sex=="male")$bill_length_mm
+chistrap_f <- subset(palmer_penguins, species=="Chinstrap" & sex=="female")$bill_length_mm
+
+var.test(chinstrap_m, chistrap_f, alternative = "two.sided")
+
+#p-value = 0.0001593
+
+
+#bill_depth_mm
+chinstrap_m <- subset(palmer_penguins, species=="Chinstrap" & sex=="male")$bill_depth_mm
+chistrap_f <- subset(palmer_penguins, species=="Chinstrap" & sex=="female")$bill_depth_mm
+
+var.test(chinstrap_m, chistrap_f, alternative = "two.sided")
+
+#p-value = 0.8833
+
+#flipper_length_mm
+chinstrap_m <- subset(palmer_penguins, species=="Chinstrap" & sex=="male")$flipper_length_mm
+chistrap_f <- subset(palmer_penguins, species=="Chinstrap" & sex=="female")$flipper_length_mm
+
+var.test(chinstrap_m, chistrap_f, alternative = "two.sided")
+
+#p-value = 0.8288
+
+
+#body_mass_g
+chinstrap_m <- subset(palmer_penguins, species=="Chinstrap" & sex=="male")$body_mass_g
+chistrap_f <- subset(palmer_penguins, species=="Chinstrap" & sex=="female")$body_mass_g
+
+var.test(chinstrap_m, chistrap_f, alternative = "two.sided")
+
+# p-value = 0.1762
+
+```
+
+| Species | Measurement | p-value | Equal variance? |
+|---|---|---|---|
+| Adelie | Bill length | 0.330 | Yes |
+| Adelie | Bill depth | 0.513 | Yes |
+| Adelie | Flipper length | 0.164 | Yes |
+| Adelie | Body mass | 0.034 | No |
+| Gentoo | Bill length | 0.033 | No |
+| Gentoo | Bill depth | 0.017 | No |
+| Gentoo | Flipper length | 0.005 | No |
+| Gentoo | Body mass | 0.421 | Yes |
+| Chinstrap | Bill length | 0.0002 | No |
+| Chinstrap | Bill depth | 0.883 | Yes |
+| Chinstrap | Flipper length | 0.829 | Yes |
+| Chinstrap | Body mass | 0.176 | Yes |
+
+
+P values greater than 0.05 indicate where variances are statistically equal.
+Based on the R code output above, Adelie body_mass_g, Gentoo bill depth, Gentoo flipper length, Gentoo body mass, Chinstrap bill length all suggest inequal variances. We then set var.equal parameter in the t-test = to FALSE for these measurements.
+
+
+Next we performed a t-test, following the approach shown by Frery (2026) to check for a significant difference between the means within each species. The t-test divides the difference in sample means by the standard error. setting equal variances to true or false hence has an effect on the calculation of the standard error and the degrees of freedom used. Results shown below.
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| results: 'hide'
+
+#Adelie
+
+
+#Bill_length
+t.test(subset(palmer_penguins, species=="Adelie" & sex=="male")$bill_length_mm,
+subset(palmer_penguins, species=="Adelie" & sex=="female")$bill_length_mm, var.equal=TRUE)
+
+# p-value = 4.44e-15 smaller than 0.05 suggests that there is a significant difference between males and female bill_length within the species
+
+#bill_depth_mm
+t.test(subset(palmer_penguins, species=="Adelie" & sex=="male")$bill_depth_mm,
+subset(palmer_penguins, species=="Adelie" & sex=="female")$bill_depth_mm, var.equal=TRUE)
+
+#*p-value = 1.844e-15 suggests significant difference 
+
+#flipper_length_mm
+t.test(subset(palmer_penguins, species=="Adelie" & sex=="male")$flipper_length_mm,
+subset(palmer_penguins, species=="Adelie" & sex=="female")$flipper_length_mm, var.equal=TRUE)
+
+#p-value = 1.09e-05
+
+#body_mass_g
+#UNEQUAL VARIANCES 
+t.test(subset(palmer_penguins, species=="Adelie" & sex=="male")$body_mass_g,
+subset(palmer_penguins, species=="Adelie" & sex=="female")$body_mass_g, var.equal=FALSE)
+
+#p-value < 2.2e-16
+
+#Gentoo
+
+#Bill_length
+t.test(subset(palmer_penguins, species=="Gentoo" & sex=="male")$bill_length_mm,
+subset(palmer_penguins, species=="Gentoo" & sex=="female")$bill_length_mm, var.equal=FALSE)
+
+#* p-value = 1.315e-14
+
+#bill_depth_mm
+t.test(subset(palmer_penguins, species=="Gentoo" & sex=="male")$bill_depth_mm,
+subset(palmer_penguins, species=="Gentoo" & sex=="female")$bill_depth_mm, var.equal=FALSE)
+
+#*p-value < 2.2e-16
+
+#flipper_length_mm
+t.test(subset(palmer_penguins, species=="Gentoo" & sex=="male")$flipper_length_mm,
+subset(palmer_penguins, species=="Gentoo" & sex=="female")$flipper_length_mm, var.equal=FALSE)
+
+#p-value < 2.2e-16
+
+#body_mass_g
+t.test(subset(palmer_penguins, species=="Gentoo" & sex=="male")$body_mass_g,
+subset(palmer_penguins, species=="Gentoo" & sex=="female")$body_mass_g, var.equal=TRUE)
+
+#p-value < 2.2e-16
+
+
+
+#Chinstrap
+
+#Bill_length
+t.test(subset(palmer_penguins, species=="Chinstrap" & sex=="male")$bill_length_mm,
+subset(palmer_penguins, species=="Chinstrap" & sex=="female")$bill_length_mm, var.equal=FALSE)
+
+#* p-value = 8.918e-10
+
+
+#bill_depth_mm
+t.test(subset(palmer_penguins, species=="Chinstrap" & sex=="male")$bill_depth_mm,
+subset(palmer_penguins, species=="Chinstrap" & sex=="female")$bill_depth_mm, var.equal=TRUE)
+
+#*p-value = 6.564e-13
+
+
+#flipper_length_mm
+t.test(subset(palmer_penguins, species=="Chinstrap" & sex=="male")$flipper_length_mm,
+subset(palmer_penguins, species=="Chinstrap" & sex=="female")$flipper_length_mm, var.equal=TRUE)
+
+#p-value = 2.526e-07
+
+#body_mass_g
+t.test(subset(palmer_penguins, species=="Chinstrap" & sex=="male")$body_mass_g,
+subset(palmer_penguins, species=="Chinstrap" & sex=="female")$body_mass_g, var.equal=TRUE)
+
+#p-value = 2.044e-06
+
+
+```
+
+| Species | Measurement | Mean (male) | Mean (female) | t-statistic | p-value |
+|---|---|---|---|---|---|
+| Adelie | Bill length (mm) | 40.39 | 37.26 | 8.78 | 4.44e-15 |
+| Adelie | Bill depth (mm) | 19.07 | 17.62 | 8.93 | 1.84e-15 |
+| Adelie | Flipper length (mm) | 192.41 | 187.79 | 4.56 | 1.09e-05 |
+| Adelie | Body mass (g) | 4043.49 | 3368.84 | 13.13 | < 2.2e-16 |
+| Gentoo | Bill length (mm) | 49.47 | 45.56 | 8.88 | 1.32e-14 |
+| Gentoo | Bill depth (mm) | 15.72 | 14.24 | 12.49 | < 2.2e-16 |
+| Gentoo | Flipper length (mm) | 221.54 | 212.71 | 9.94 | < 2.2e-16 |
+| Gentoo | Body mass (g) | 5484.84 | 4679.74 | 14.72 | < 2.2e-16 |
+| Chinstrap | Bill length (mm) | 51.09 | 46.57 | 7.57 | 8.92e-10 |
+| Chinstrap | Bill depth (mm) | 19.25 | 17.59 | 8.90 | 6.56e-13 |
+| Chinstrap | Flipper length (mm) | 199.91 | 191.74 | 5.75 | 2.53e-07 |
+| Chinstrap | Body mass (g) | 3938.97 | 3527.21 | 5.21 | 2.04e-06 |
+
+Next we looked at Hotellings t test, based on R code from the lecture presented by Frery (2026), to examine all the measurements together grouped. Here we compared the mean as vectors where measurements are related - a penguin with with larger measurements would generally be likely to be heavier.
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| results: 'hide'
+
+# extract measurement columns
+library(Hotelling)
+
+#adelie
+
+#grab by column index for measurement columns
+adelie_m <- subset(palmer_penguins, species == "Adelie" & sex == "male")[, 3:6]
+adelie_f <- subset(palmer_penguins, species == "Adelie" & sex == "female")[, 3:6]
+adelie_hotelling <- hotelling.test(adelie_m, adelie_f)
+adelie_hotelling
+
+
+#gentoo
+gentoo_m <- subset(palmer_penguins, species == "Gentoo" & sex == "male")[, 3:6]
+gentoo_f <- subset(palmer_penguins, species == "Gentoo" & sex == "female")[, 3:6]
+gentoo_hotelling <-hotelling.test(gentoo_m, gentoo_f)
+gentoo_hotelling
+
+
+
+#chinstrap
+chinstrap_m <- subset(palmer_penguins, species == "Chinstrap" & sex == "male")[, 3:6]
+chinstrap_f <- subset(palmer_penguins, species == "Chinstrap" & sex == "female")[, 3:6]
+chinstrap_hotelling <- hotelling.test(chinstrap_m, chinstrap_f)
+chinstrap_hotelling
+
+
+
+```
+
+| Species | Test statistic | Numerator df | Denominator df | p-value |
+|---|---|---|---|---|
+| Adelie | 245.09 | 4 | 141 | ≈ 0 |
+| Gentoo | 292.15 | 4 | 114 | ≈ 0 |
+| Chinstrap | 115.23 | 4 | 63 | 3.19e-13 |
+
+
+We then ran the Box M test next to determine if the covariance matrices (sigma) across different groups are equal. The test will check spreads and variation
+to then determine sigma overall or per species.
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| results: 'hide'
+
+library(biotools)
+
+
+adelie <- droplevels(subset(palmer_penguins, species=="Adelie"))
+boxM(adelie[, 3:6], adelie$sex) #grab by column index for measurement columns
+
+#p-value = 0.06117
+
+gentoo <- droplevels(subset(palmer_penguins, species=="Gentoo"))
+boxM(gentoo[, 3:6], gentoo$sex) #grab by column index for measurement columns
+
+#p-value = 0.003452
+
+chinstrap <- droplevels(subset(palmer_penguins, species=="Chinstrap"))
+boxM(chinstrap[, 3:6], chinstrap$sex) #grab by column index for measurement columns
+
+#p-value = 0.00647
+
+
+
+
+```
+
+| Species | Chi-Sq (approx.) | df | p-value | Significant at α=0.05? |
+|---|---|---|---|---|
+| Adelie | 17.65 | 10 | 0.061 | No (borderline) |
+| Gentoo | 26.22 | 10 | 0.0035 | Yes |
+| Chinstrap | 24.46 | 10 | 0.0065 | Yes |
+
+An alpha value p=0.05 is used for this test. The null hypothesis is rejected where the p value falls below this threshold, suggesting that males and females have significantly different covariance shapes. We failed to reject the null hypothesis for Adelie but reject for Gentoo and Chinstrap. This suggests that Gentoo and Chinstrap have significant covariance structures.
+
+
+
+
+
+## Part 2: Classification with sex and without sex
+We then progressed with the second part of our question:
+
+First, we calculated the average size of the penguins and spread for each species to find the Mahalanobis distance, based on R code used by Frery (2026).
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| results: 'hide'
+
+
+#Adelie
+mean.adelie <- colMeans(subset(palmer_penguins, species=="Adelie")[, 3:6])
+mean.adelie
+covariance.adelie <- var(subset(palmer_penguins, species=="Adelie")[, 3:6])
+covariance.adelie
+
+#Gentoo
+mean.gentoo   <- colMeans(subset(palmer_penguins, species=="Gentoo")[, 3:6])
+mean.gentoo
+covariance.gentoo <- var(subset(palmer_penguins, species=="Gentoo")[, 3:6])
+covariance.gentoo
+
+
+#Chinstrap
+mean.chinstrap   <- colMeans(subset(palmer_penguins, species=="Chinstrap")[, 3:6])
+mean.chinstrap
+covariance.chinstrap <- var(subset(palmer_penguins, species=="Chinstrap")[, 3:6])
+covariance.chinstrap
+
+```
+
+
+We used the Mahalanobis distance to find the distance of an individual penguin from the mean vector for the species with relation to the spread. This will show us how similar individual seem according to each species.
+
+Covariance is also a parameter of this hence we performed a Box M test again to examine covariances of species to determine whether we used separate or shared covariances matrices.
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: false
+#| results: 'hide'
+
+boxM(palmer_penguins[, 3:6], palmer_penguins$species)
+
+
+```
+
+We initially considered using a chi-squared test but it only looks at penguin to its own species rather than to all the groups available so it cannot accurately compare across species so we changed the method.
+
+```{r}
+#| echo: true
+#| eval: true
+#| results: 'hide'
+
+d1.adelie    <- mahalanobis(palmer_penguins[, 3:6], center = mean.adelie,    cov = covariance.adelie)
+d2.gentoo    <- mahalanobis(palmer_penguins[, 3:6], center = mean.gentoo,    cov = covariance.gentoo)
+d3.chinstrap <- mahalanobis(palmer_penguins[, 3:6], center = mean.chinstrap, cov = covariance.chinstrap)
+
+combined <- cbind(d1.adelie, d2.gentoo, d3.chinstrap)
+species_labels <- c("Adelie", "Gentoo", "Chinstrap")
+combined_df <- species_labels[apply(combined, 1, which.min)]
+combined_df
+
+
+
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| results: 'hide'
+
+
+misclassified <- which(combined_df != palmer_penguins$species)
+length(misclassified)
+
+
+```
+Here each individual penguin is compared on its measurements to the centroids of each species and finds the one with the closest distance (most similar).
+
+
+We then repeated this model but factor in the male vs female as a variable for each species to see if the misclassified penguins changes with the 6 centroid model (3 species, 2 sexes) in comparison to 3 centroids (3 species).
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| results: 'hide'
+
+
+#adelie
+
+mean.adelie.m    <- colMeans(subset(palmer_penguins, species=="Adelie" & sex=="male")[, 3:6])
+covariance.adelie.m <- var(subset(palmer_penguins, species=="Adelie" & sex=="male")[, 3:6])
+
+mean.adelie.f    <- colMeans(subset(palmer_penguins, species=="Adelie" & sex=="female")[, 3:6])
+covariance.adelie.f <- var(subset(palmer_penguins, species=="Adelie" & sex=="female")[, 3:6])
+
+d1m.adelie <- mahalanobis(palmer_penguins[, 3:6], center = mean.adelie.m, cov = covariance.adelie.m)
+d1f.adelie <- mahalanobis(palmer_penguins[, 3:6], center = mean.adelie.f, cov = covariance.adelie.f)
+
+
+
+#Gentoo
+mean.gentoo.m    <- colMeans(subset(palmer_penguins, species=="Gentoo" & sex=="male")[, 3:6])
+covariance.gentoo.m <- var(subset(palmer_penguins, species=="Gentoo" & sex=="male")[, 3:6])
+
+mean.gentoo.f    <- colMeans(subset(palmer_penguins, species=="Gentoo" & sex=="female")[, 3:6])
+covariance.gentoo.f <- var(subset(palmer_penguins, species=="Gentoo" & sex=="female")[, 3:6])
+
+d2m.gentoo <- mahalanobis(palmer_penguins[, 3:6], center = mean.gentoo.m, cov = covariance.gentoo.m)
+d2f.gentoo <- mahalanobis(palmer_penguins[, 3:6], center = mean.gentoo.f, cov = covariance.gentoo.f)
+
+
+#Chinstrap
+
+mean.chinstrap.m    <- colMeans(subset(palmer_penguins, species=="Chinstrap" & sex=="male")[, 3:6])
+covariance.chinstrap.m <- var(subset(palmer_penguins, species=="Chinstrap" & sex=="male")[, 3:6])
+
+mean.chinstrap.f    <- colMeans(subset(palmer_penguins, species=="Chinstrap" & sex=="female")[, 3:6])
+covariance.chinstrap.f <- var(subset(palmer_penguins, species=="Chinstrap" & sex=="female")[, 3:6])
+
+d3m.chinstrap <- mahalanobis(palmer_penguins[, 3:6], center = mean.chinstrap.m, cov = covariance.chinstrap.m)
+d3f.chinstrap <- mahalanobis(palmer_penguins[, 3:6], center = mean.chinstrap.f, cov = covariance.chinstrap.f)
+
+
+combined_sex <- cbind(d1m.adelie, d1f.adelie, d2m.gentoo, d2f.gentoo, d3m.chinstrap, d3f.chinstrap)
+
+group_labels <- c("Adelie","Adelie","Gentoo","Gentoo","Chinstrap","Chinstrap")
+
+combined_sex_df <- group_labels[apply(combined_sex, 1, which.min)]
+
+
+misclassified_sex <- which(combined_sex_df != palmer_penguins$species)
+length(misclassified_sex)
+
+
+
+misclassified_df_final <- data.frame(
+  row_id = 1:nrow(palmer_penguins),
+  species = palmer_penguins$species,
+  sex = palmer_penguins$sex,
+  predicted = combined_df,
+  correct = combined_df == palmer_penguins$species
+)
+
+misclassified_sex_df_final <- data.frame(
+  row_id = 1:nrow(palmer_penguins),
+  species = palmer_penguins$species,
+  sex = palmer_penguins$sex,
+  predicted = combined_sex_df,
+  correct = combined_sex_df == palmer_penguins$species
+)
+
+
+#misclassified penguins with and without sex
+#head(misclassified_df_final)
+#head(misclassified_sex_df_final)
+
+
+#filtered
+filtered_misclassified_df_final <- subset(misclassified_df_final, correct == FALSE)
+filtered_misclassified_sex_df_final   <- subset(misclassified_sex_df_final, correct == FALSE)
+
+```
+
+```{r}
+#| echo: true
+#| eval: true
+#| results: 'hide'
+
+
+#adelie
+d1m.adelie <- mahalanobis(palmer_penguins[, 3:6], center = mean.adelie.m, cov = covariance.adelie.m)
+d1f.adelie <- mahalanobis(palmer_penguins[, 3:6], center = mean.adelie.f, cov = covariance.adelie.f)
+
+
+
+#Gentoo
+d2m.gentoo <- mahalanobis(palmer_penguins[, 3:6], center = mean.gentoo.m, cov = covariance.gentoo.m)
+d2f.gentoo <- mahalanobis(palmer_penguins[, 3:6], center = mean.gentoo.f, cov = covariance.gentoo.f)
+
+
+#Chinstrap
+d3m.chinstrap <- mahalanobis(palmer_penguins[, 3:6], center = mean.chinstrap.m, cov = covariance.chinstrap.m)
+d3f.chinstrap <- mahalanobis(palmer_penguins[, 3:6], center = mean.chinstrap.f, cov = covariance.chinstrap.f)
+
+
+combined_sex <- cbind(d1m.adelie, d1f.adelie, d2m.gentoo, d2f.gentoo, d3m.chinstrap, d3f.chinstrap)
+
+group_labels <- c("Adelie","Adelie","Gentoo","Gentoo","Chinstrap","Chinstrap")
+
+combined_sex_df <- group_labels[apply(combined_sex, 1, which.min)]
+
+
+
+```
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| results: 'hide'
+
+
+# check misclassified penguins from the loaded data
+check_misclassified_4 <- subset(palmer_penguins, row_id %in% c(68, 124, 286, 296))
+check_misclassified_4
+check_misclassified_1 <- subset(palmer_penguins, row_id %in% 274)
+check_misclassified_1
+
+
+# generate mean values again for examination
+#mean.adelie.f
+#mean.chinstrap.f
+#mean.adelie.m
+#mean.chinstrap.m
+
+#mean.adelie
+#mean.chinstrap
+
+
+```
+
+

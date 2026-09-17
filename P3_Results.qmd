@@ -1,0 +1,62 @@
+
+## Results
+
+Part 1: Sex difference within species
+
+F-test:
+P values greater than 0.05 indicate where variances are statistically equal.
+Based on the R code output above, Adelie body_mass_g, Gentoo bill depth, Gentoo flipper length, Gentoo body mass, Chinstrap bill length all suggest inequal variances.
+
+
+T-test:
+Based on the r output, we can see the p values for the t test for all measurements within each species satisfy p <0.05. This suggests that all of these measurements are statistically significant for male vs female means.
+
+Hotelling's T^2 Test:
+Small p values here indicate that males and females within-species are meaningfully different (Adelie: p ≈ 0; Gentoo: p ≈ 0; Chinstrap: p = 3.191 × 10⁻¹³) when measurements are considered together and that these differences are unlikley to have occurred by chance.
+
+Box's M test:
+An alpha value p=0.05 is used for this test. The null hypothesis is rejected where the p value falls below this threshold, suggesting that males and females have significantly different covariance shapes. We failed to reject the null hypothesis for Adelie but reject for Gentoo and Chinstrap. This suggests that Gentoo and Chinstrap have significant covariances.
+
+This suggests that males and females within-species not only differ in average measurements (from t-test and Hotellings T^2) but also their covariance shape. On the other hand, Adelies have a more similar covariance shape between males and females.
+
+
+Part 2:
+Classification with and without sex
+
+Box's M Test: Returned p-value = 3.02e-08, showing that there is a statistically significant difference in covariance sturctures between the three species.
+
+
+Classification without sex: 5 penguins misclassified. Row IDs 68, 124, 286, 296, 274
+
+Classification with sex: 1 penguin misclassified. Row ID 274. 
+
+The table below summarises measurements for all 5 penguins.
+
+
+
+```{r}
+#| echo: false
+#| eval: true
+#| results: 'hide'
+
+
+# misclassified penguins under model without sex distinction
+filtered_misclassified_df_final 
+
+# misclassified penguins under model with sex distinction
+filtered_misclassified_sex_df_final 
+
+```
+  
+| Row ID | Species | Sex | Bill length (mm) | Bill depth (mm) | Flipper length (mm) | Body mass (g) |
+|---|---|---|---|---|---|---|
+| 68 | Adelie | male | 45.8 | 18.9 | 197 | 4150 |
+| 124 | Adelie | male | 44.1 | 18.0 | 210 | 4000 |
+| 286 | Chinstrap | female | 42.4 | 17.3 | 181 | 3600 |
+| 296 | Chinstrap | female | 40.9 | 16.6 | 187 | 3200 |
+| 274 | Chinstrap | female | 46.0 | 18.9 | 195 | 4150 |
+
+ 4 penguins (larger males and smaller females) are no longer misclassified by adding sex into the model. However, 1 new penguin becomes misclassified.
+ 
+ There were no penguins misclassified under both models.
+ 
