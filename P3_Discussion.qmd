@@ -1,0 +1,22 @@
+
+ 
+<!-- ## Discussion-->
+
+<!-- Given the limited existing literature on the Palmer Penguins dataset, this report's findings serve as a novel contribution, extending use of the dataset beyond teaching purposes into building models to address a genuine multivariate statistical question. -->
+
+Our report builds on the previous literature with the use of this dataset in a classification context. Findings are consistent with Gorman et al. (2014), who concluded that sexual dimorphism varies by penguin species and by measurement type. We examined individual measurements (t-tests), all measurements considered together (Hotelling's T²) and the covariance structure (Box's M), which provide strong evidence thatmales and females differ significantly in size within each species, but also the way the measurements relate to each other. 
+
+Additionally, our Box's M results, showing significant covariance differences by sex in Chinstrap and Gentoo but not Adelie, are in line with Gorman et al.'s (2014) overall ranking for the level of sexual dimorphism: 1) Chinstrap, 2) Gentoo, and 3) Adelie. While the means for Adelie had a significant difference, its covariance shape did not differ significantly between sexes (p = 0.061), suggesting Adelie males and females vary in a more similar way than for males and females of Gentoo or Chinstrap species.
+ 
+Our findings also show that sex has a visible and clear effect on species classification. In the model without distinction for sex, penguins 68, 124, 286, and 296 were misclassified. However, in the model with sex considered, these individuals are no longer misclassified - although penguin 274 becomes misclassified.
+
+Adelie males ID 68 and ID 124 seem to have longer bill lengths and flipper lengths. Based on the 3 centroids of Adelie, Gentoo and Chinstrap in the first model, these individuals seem to be larger and closer to the Chinstrap centroid due to the combined Adelie centroid affected by the inclusion of smaller female Adelie measurements. However, once we split each species by sex, these individuals become correctly classified as closest to male Adelie due to the narrower and more accurate mean measurements.
+
+In the original model, Chinstrap female 286 and 296 are misclassified as Adelie until sex is considered. 286 and 296 seem to have shorter bill lengths and shorter flipper lengths. In addition, 296 seems to have a lower body mass and shorter bill depth. In the model with consideration for within-species sex, we can see this is corrected and that these individuals now appear closer to Chinstrap females.
+
+Misclassification with our second model suggests that penguin ID 274 is a Chinstrap female that appears to be within the combined-sex Chinstrap measurement range when sex is not considered. Although its bill length is in line with the Chinstrap female average, its body mass and bill depth are disproportionately larger, and therefore, once sex is factored in, the measurements of penguin 274 lies closer to a male Adelie. 
+
+A limitation of our analysis is that all classification was performed using the same limited sample dataset, and therefore, our results may not be consistent if applied to a new sample from the population. We also note that the model did not account for the 11 penguins with unconfirmed sex as they were removed at the start from the dataset. To build on our findings, a possible direction for a future study would be investigating whether sex, when unknown, can be determined from body measurements.
+
+
+
