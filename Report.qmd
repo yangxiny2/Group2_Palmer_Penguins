@@ -17,7 +17,7 @@ execute:
 
 # Results
 
-{{< include P1_results.qmd >}} {{< include P2_results.qmd >}} {{< include P3_Results.qmd >}}
+{{< include P2_results.qmd >}} {{< include P3_Results.qmd >}}
 
 # Discussion
 
