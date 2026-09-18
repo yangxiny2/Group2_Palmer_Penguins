@@ -20,7 +20,3 @@ execute:
 
 {{< include P3_results.qmd >}}
 
-
-# Bibliography
-
-{{< include bibliography.bib >}}
