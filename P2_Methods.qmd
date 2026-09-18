@@ -1,0 +1,94 @@
+---
+title: "P2_Methods"
+format: html
+editor: visual
+---
+
+```{r, include=FALSE}
+library(palmerpenguins)
+library(ggplot2)
+library(reshape2)
+library(ggcorrplot)
+library(ggbiplot)
+library(dplyr)
+library(tidyr)
+```
+
+```{r, echo=FALSE}
+cleanpenguins <- read.csv("penguins_cleaned.csv")
+#peng_nums <- cleanpenguins[,3:6]
+numeric_vars <- c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g")
+df_numeric <- cleanpenguins[, numeric_vars]
+```
+
+```{r, include = FALSE, echo=FALSE}
+mahalanobis_by_species <- function(data_sub) {
+  x   <- as.matrix(data_sub[, numeric_vars])
+  mu  <- colMeans(x)
+  S   <- cov(x)
+  mahalanobis(x, center = mu, cov = S)
+}
+
+cleanpenguins <- cleanpenguins %>%
+  group_by(species) %>%
+  mutate(dM_subgroup = mahalanobis_by_species(cur_data())) %>%
+  ungroup()
+
+peng_melt <- melt(
+  data = cleanpenguins,
+  id.vars = c("species", "sex"),
+  measure.vars = numeric_vars,
+  variable.name = "Measurement",
+  value.name = "value"
+)
+```
+
+# How the plots were made
+
+## Univariate & Fitted Densities
+
+For each of our four numerical variables (bill length, bill depth, flipper length, body mass), we plotted a histogram of density against value, faceted by species, with a normal density curve overlaid.
+
+## Box plots & Multi-Class Comparisons
+
+Melted the data, applied a log scale, set the notch to true.
+
+## Correlograms & Scatterplot Matrices
+
+We made a pairwise Pearson correlatoin matrix of the four continious variables using `cor()` and visialised it with `ggcorrplot()` with `method = "circle"`, where the sizes and colour of each circle reflects magnitude. We correlated a pooled version including all penguins, then within each of the species separately.
+
+## Mahalanobis ($\chi^2$) Diagnostic Plots
+
+We calculated the squared Mahalanobis distances $d^2_M$ and plotted their histogram using Freedman-Diaconis binning. We made a pooled model, using the overall mean and covariance's across all penguins, and also a subgroup mode using each species own means and covariances.
+
+We then overlayed the theoretical Chi-squared density curve `dchisq(df = 4)` and drew vertical lines at the upper quantiles (0.9, 0.95, 0.99), to categorise each observation as "Typical", "Somewhat", "Surprising", or "Very". We then also made chi-square QQ-plogs of the subgroup distances.
+
+## Principal Component Analysis (PCA) Biplots
+
+We computed the principal components using `prcomp()`, standardising each variable first using `scale. = TRUE`.
+
+Plot observations and variable loading vectors were projected on PC1 and PC2 using `ggbiplot()`, adding class concentration ellipses per species.
+
+# How the Normality Tests Were Done
+
+## Univariate Normality Assessment
+
+### Normal QQ plots.
+
+Sample quantiles for each of our four measurements were plotted against theoretical standard normal quantiles using `stat_qq()` / `stat_qq_line()`, faceted by species and measurements.
+
+### Parametric Curve Fitting.
+
+Compared empirical histograms against theoretical density curves.
+
+## Multivariate Normality Assessment via Squared Mahalanobis Distance
+
+### Theoretical Property
+
+If the squared Mahalanobis distance follows the $\chi^2_4$ distribution.
+
+## Accounting for Mixture Distributions
+
+### Subgroup vs Aggregated Models
+
+The three species have visibly different centroids, so an unusual penguin in the context of the entire dataset, mught not actually be unusual within its own species. To avoid this we made a pooled model with overall mean and covariance, and a subgroup model using each species own mean and covariance.

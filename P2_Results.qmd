@@ -1,0 +1,319 @@
+---
+title: "P2_Results"
+format: html
+editor: visual
+---
+
+```{r, include=FALSE}
+library(palmerpenguins)
+library(ggplot2)
+library(reshape2)
+library(ggcorrplot)
+library(ggbiplot)
+library(dplyr)
+library(tidyr)
+```
+
+```{r, echo=FALSE}
+cleanpenguins <- read.csv("penguins_cleaned.csv")
+#peng_nums <- cleanpenguins[,3:6]
+numeric_vars <- c("bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g")
+df_numeric <- cleanpenguins[, numeric_vars]
+```
+
+```{r, include = FALSE, echo=FALSE}
+mahalanobis_by_species <- function(data_sub) {
+  x   <- as.matrix(data_sub[, numeric_vars])
+  mu  <- colMeans(x)
+  S   <- cov(x)
+  mahalanobis(x, center = mu, cov = S)
+}
+
+cleanpenguins <- cleanpenguins %>%
+  group_by(species) %>%
+  mutate(dM_subgroup = mahalanobis_by_species(cur_data())) %>%
+  ungroup()
+
+peng_melt <- melt(
+  data = cleanpenguins,
+  id.vars = c("species", "sex"),
+  measure.vars = numeric_vars,
+  variable.name = "Measurement",
+  value.name = "value"
+)
+```
+
+# Plots
+
+## A. 1D Histogram with Fitted Normal Density
+
+```{r Hist norm}
+normal_curves <- peng_melt %>%
+  group_by(species, Measurement) %>%
+  summarise(
+    x = list(seq(min(value), max(value), length.out = 200)),
+    m = mean(value),
+    s = sd(value),
+    .groups = "drop"
+  ) %>%
+  unnest(x) %>%
+  mutate(y = dnorm(x, mean = m, sd = s))
+
+ggplot(peng_melt, aes(x = value)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    bins = 20,
+    fill = "white",
+    col = "black"
+  ) +
+  geom_line(data = normal_curves, aes(x=x, y=y), col = "red", linewidth = 1
+  ) +
+  facet_grid(species ~ Measurement, scales = "free") +
+  labs(
+    title = "Histograms with Fitted Normal Density, by Species",
+    x = NULL,
+    y = "Density"
+  ) +
+  theme_minimal()  
+```
+
+QQ Plot as well, with each measurement.
+
+```{r}
+ggplot(cleanpenguins, aes(sample = bill_depth_mm)) + stat_qq() + stat_qq_line() + labs(
+  title = "Bill Depth"
+) 
+
+ggplot(cleanpenguins, aes(sample = bill_length_mm)) + stat_qq() + stat_qq_line() + labs(
+  title = "Bill Length"
+)
+
+ggplot(cleanpenguins, aes(sample = flipper_length_mm)) + stat_qq() + stat_qq_line() + labs(
+  title = "Flipper Length"
+)
+ggplot(cleanpenguins, aes(sample = body_mass_g)) + stat_qq() + stat_qq_line() + labs(
+  title = "Body Mass"
+)
+```
+
+The per-species histograms show a reasonably
+
+## B. Faceted Box plots with Logarithmic Scale
+
+```{r}
+ggplot(data = peng_melt, aes(x = Measurement, y = value)) +
+  geom_boxplot(aes(col = Measurement), notch = TRUE) +
+  scale_y_log10() +
+  facet_grid(sex ~ species) +
+  labs(
+    title = "Log-Scaled Morphological Measurements by Species",
+    x = "Measurement",
+    y = "Measurements (log10 scale)"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(size = 8, angle = 45, hjust = 1), legend.position = "none")
+```
+
+## C. Correlogram
+
+```{r}
+R_matrix <- cor(df_numeric)
+
+ggcorrplot(
+  R_matrix,
+  method = "circle",
+  hc.order = TRUE,
+  type = "lower",
+  lab = TRUE
+) + 
+  labs(title = "Correlogram of Morphological Variables")
+```
+
+Bill length and Bill depth show almost no correlation pooled across species. Within species, a penguin with a longer bill, will have a proportionally deeper bill. The reason the pooled correlation is as it is, is penguins with longer bills do not hava proportionally deeper bill compared to a penguin with a shorter bill. The mixing of species here has cancelled this out.
+
+```{r}
+cleanpenguins %>% group_by(species) %>% summarise(cor(bill_length_mm, bill_depth_mm))
+```
+
+## D. Mahalanobis Distance Histogram with $\chi^2$ Cut-Points
+
+```{r}
+# A. Pooled Model Mahananobis Distances
+mu_hat <- colMeans(df_numeric)
+Sigma_hat <- cov(df_numeric)
+dM_pooled <- mahalanobis(df_numeric, center = mu_hat, cov = Sigma_hat)
+
+upper_quantiles <- qchisq(c(0.9, 0.95, 0.99), df = 4)
+density_at_quantiles <- dchisq(x = upper_quantiles, df = 4)
+cut_points <- data.frame(upper_quantiles, density_at_quantiles)
+
+ggplot(data.frame(dM = dM_pooled), aes(x = dM)) +
+  geom_histogram(
+    aes(y = after_stat(density)),
+    bins = nclass.FD(dM_pooled),
+    fill = "white",
+    col = "black"
+  ) +
+  geom_rug() +
+  stat_function(fun = dchisq, args = list(df = 4), col = "red", linewidth = 1.2) +
+  geom_segment(
+    data = cut_points,
+    aes(x = upper_quantiles, xend = upper_quantiles, y = rep(0, 3), yend = density_at_quantiles),
+    col = "blue",
+    linewidth = 1
+  ) +
+  labs(
+    title = "Mahalanobis Distances (Pooled Model) vs Chi-Squared (df = 4)",
+    x = "Mahalanobis distances and cut points",
+    y = "Histogram and density"
+  ) +
+  theme_minimal()
+
+# Suprise Levels
+cleanpenguins$dM_pooled <- dM_pooled
+cleanpenguins$surprise <- cut(
+  cleanpenguins$dM_pooled,
+  breaks = c(0, upper_quantiles, Inf),
+  labels = c("Typical", "Somewhat", "Surprising", "Very")
+)
+
+cat("\nSurprise Categorisation Table (Pooled Model):\n")
+print(table(cleanpenguins$surprise))
+```
+
+Subgroup Model
+
+```{r}
+mahalanobis_by_species <- function(data_sub) {
+  x   <- as.matrix(data_sub[, numeric_vars])
+  mu  <- colMeans(x)
+  S   <- cov(x)
+  mahalanobis(x, center = mu, cov = S)
+}
+
+cleanpenguins <- cleanpenguins %>%
+  group_by(species) %>%
+  mutate(dM_subgroup = mahalanobis_by_species(cur_data())) %>%
+  ungroup()
+
+ggplot(cleanpenguins, aes(x = dM_subgroup)) +
+  geom_histogram(aes(y = after_stat(density)), bins = 15, fill = "white", col = "black") +
+  geom_rug() +
+  stat_function(fun = dchisq, args = list(df = 4), col = "red", linewidth = 1.2) +
+  facet_wrap(~ species, scales = "free") +
+  labs(
+    title = "Mahalanobis Distances (Subgroup Model) vs Chi-Squared (df = 4)",
+    x = "Mahalanobis distance (within species)",
+    y = "Histogram and density"
+  ) +
+  theme_minimal()
+
+# Same chi-square QQ-plot idea, but as a QQ-plot rather than a
+# histogram overlay -- easier to judge fit in the tails, which is
+# where MVN violations usually show up.
+qq_data <- cleanpenguins %>%
+  group_by(species) %>%
+  arrange(dM_subgroup, .by_group = TRUE) %>%
+  mutate(
+    i     = row_number(),
+    n     = n(),
+    chi_q = qchisq((i - 0.5) / n, df = 4)
+  ) %>%
+  ungroup()
+
+ggplot(qq_data, aes(x = chi_q, y = dM_subgroup)) +
+  geom_point(alpha = 0.7) +
+  geom_abline(slope = 1, intercept = 0, col = "red", linetype = "dashed") +
+  facet_wrap(~ species, scales = "free") +
+  labs(
+    title = "Chi-square QQ-plot of Mahalanobis distances, by species",
+    x = expression("Chi-square quantiles ("*chi[4]^2*")"),
+    y = "Squared Mahalanobis distance"
+  ) +
+  theme_minimal()
+```
+
+## E. PCA Biplot with Group Ellipses
+
+```{r}
+pca_res <- prcomp(df_numeric, center = TRUE, scale. = TRUE)
+
+cat("\nPrinciple Component Analysis Summary:\n")
+print(summary(pca_res))
+
+ggbiplot(
+  pca_res,
+  obs.scale = 1,
+  var.scale = 1,
+  groups = cleanpenguins$species,
+  ellipse = TRUE
+) +
+  labs(title = "PCA Biplot of Palmer Penguins by Species") +
+  theme_minimal()
+```
+
+Gentoo separates from the other two species almost entirely along PC1. Adelie and Chinstrap overlap significantly, with bill length the separator between them. Chinstrap is lower on PC2, consistent with Chinstraps having longer bills.
+
+# Results of Normality Tests
+
+## Univariate Normality:
+
+Looking at out Normal Q-Q Plot, we can see the the points do not lie close to the 1:1 diagonal line. This mean it that none of the numerical variables follow a Gaussian distribution.
+
+## Multivariate Normality:
+
+- Chi-Squared fit decision:
+
+- Pooled vs. Subgroup decision.
+
+  - The bill length/depth correlation completely flips which the data is pooled or split. -0.23 when pooled vs 0.654 within species.
+
+  - The pooled QQ plots also show a wavy pattern, with the pints not sticking to the 1:1 line. A clear sign that the pooled sample does not follow a multivariate normal distribution.
+
+  - However, the within species QQ plots follow the line a lot more tightly. With the points that deviate being extreme values on the upper right. So each species does follow a Multivariate Normal distribution, with there exception of some outliers. Chinstrap having one extreme outlier.
+
+# Surprising Observations
+
+```{r}
+# Flag individual penguins using the SUBGROUP distances (dM_subgroup),
+# since these are the ones that reflect "unusual for its own species"
+# rather than "unusual overall" -- the more meaningful definition of
+# a surprising observation here.
+subgroup_cutoffs <- qchisq(c(0.9, 0.95, 0.99), df = 4)
+
+cleanpenguins$surprise_subgroup <- cut(
+  cleanpenguins$dM_subgroup,
+  breaks = c(0, subgroup_cutoffs, Inf),
+  labels = c("Typical", "Somewhat", "Surprising", "Very")
+)
+
+cat("\nSurprise Categorisation Table (Subgroup Model):\n")
+print(table(cleanpenguins$species, cleanpenguins$surprise_subgroup))
+
+cleanpenguins %>%
+  filter(surprise_subgroup == "Very") %>%
+  select(row_id, species, sex, all_of(numeric_vars), dM_subgroup) %>%
+  arrange(desc(dM_subgroup))
+```
+
+| Penguin ID | Species | Sex | Bill Length | Bill Depth | Flipper Length | Body Mass | dM Subgroup |
+|----|----|----|----|----|----|----|----|
+| 294 | Chinstrap | female | 58.0 | 17.8 | 181 | 3700 | 25.6 |
+| 190 | Gentoo | male | 44.4 | 17.3 | 219 | 5250 | 17.7 |
+| 186 | Gentoo | male | 59.6 | 17.0 | 230 | 6050 | 16.1 |
+| 15 | Adelie | male | 34.6 | 21.1 | 198 | 4400 | 15.2 |
+| 130 | Adelie | male | 44.1 | 18.0 | 210 | 4000 | 14.1 |
+
+These are the surprising observations.
+
+Penguins 15, 130, 186, 190, 294.
+
+- Penguin 194 has an extremely large bill length for a female Chinstrap, which is close the what a long male bill length would be.
+
+- Penguin 190 has a deep bill while not having a particularly long bill. Gentoo typically have shallow bills of our three species.
+
+- Penguin 186 has the longest bill in the dataset.
+
+- Penguin 15 has an unusually short bill, while having a deep bill. A strange ratio, rather than an extreme size.
+
+- Penguin 130 has a large bill a=for an Adelie, with it being closer in size to a Chinstrap.
