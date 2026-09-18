@@ -1,8 +1,4 @@
----
-title: "P2_Methods"
-format: html
-editor: visual
----
+
 
 ```{r, include=FALSE}
 library(palmerpenguins)
