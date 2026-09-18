@@ -22,7 +22,6 @@ by(penguins_cleaned, penguins_cleaned$species, summary)
 
 ```{r}
 
-install.packages("ggplot2")
 library(ggplot2)
 ggplot(penguins_cleaned, 
        aes(x = species, y = body_mass_g)) +
