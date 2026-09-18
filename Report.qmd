@@ -10,7 +10,7 @@ execute:
 
 # Introduction
 
-{{< include Introduction1.qmd >}}
+{{< include Introduction2.qmd >}}
 
 # Methods
 
@@ -20,6 +20,7 @@ execute:
 
 {{< include P3_results.qmd >}}
 
-# Discussion
 
-{{< include P3_Discussion.qmd >}}
+# Bibliography
+
+{{< include bibliography.bib >}}
