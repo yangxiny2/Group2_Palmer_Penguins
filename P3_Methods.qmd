@@ -1,4 +1,5 @@
 
+
 <!--## Methods-->
 
 To answer the question, we broke it into 2 parts: 
@@ -27,7 +28,7 @@ palmer_penguins$sex <- as.factor(palmer_penguins$sex)
 ```
 
 
-We wanted to first perform a t-test to determine whether there was a significant difference between the mean measurements of each species, accounting for males and females. This approach follows R code demonstrated in a STAT394 lecture (Frery, 2026).
+We wanted to first perform a t-test to determine whether there was a significant difference between the mean measurements of each species, accounting for males and females. This approach follows R code demonstrated in a STAT394 lecture [@frery2026lecture].
 
 However, to run the t-tests required first performing an F-test to determine whether males and females within each species have equal variance. Results shown below.
 
@@ -162,7 +163,7 @@ P values greater than 0.05 indicate where variances are statistically equal.
 Based on the R code output above, Adelie body_mass_g, Gentoo bill depth, Gentoo flipper length, Gentoo body mass, Chinstrap bill length all suggest unequal variances. We then set the var.equal parameter in the t-test to FALSE for these measurements.
 
 
-Next we performed a t-test, following the approach shown by Frery (2026) to check for a significant difference between the means within each species. The t-test divides the difference in sample means by the standard error. Setting equal variances to true or false hence has an effect on the calculation of the standard error and the degrees of freedom used. Results shown below.
+Next we performed a t-test, following the approach shown by [@frery2026lecture] to check for a significant difference between the means within each species. The t-test divides the difference in sample means by the standard error. Setting equal variances to true or false hence has an effect on the calculation of the standard error and the degrees of freedom used. Results shown below.
 
 
 ```{r}
@@ -272,7 +273,7 @@ subset(palmer_penguins, species=="Chinstrap" & sex=="female")$body_mass_g, var.e
 | Chinstrap | Flipper length (mm) | 199.91 | 191.74 | 5.75 | 2.53e-07 |
 | Chinstrap | Body mass (g) | 3938.97 | 3527.21 | 5.21 | 2.04e-06 |
 
-Next we looked at Hotelling's T^2 test, based on R code from the lecture presented by Frery (2026), to examine all the measurements together grouped. Here we compared the mean as vectors, since a penguin's measurements are related - i.e., you would expect a larger penguin to be heavier.
+Next we looked at Hotelling's T^2 test, based on R code from the lecture presented by [@frery2026lecture], to examine all the measurements together grouped. Here we compared the mean as vectors, since a penguin's measurements are related - i.e., you would expect a larger penguin to be heavier.
 
 
 ```{r}
@@ -366,7 +367,7 @@ An alpha value p=0.05 is used for this test. The null hypothesis is rejected whe
 ## Part 2: Classification with sex and without sex
 We then progressed with the second part of our question:
 
-First, we calculated the average size of the penguins and spread for each species to find the Mahalanobis distance, based on R code used by Frery (2026).
+First, we calculated the average size of the penguins and spread for each species to find the Mahalanobis distance, based on R code used by [@frery2026lecture].
 
 ```{r}
 #| echo: false
@@ -589,5 +590,6 @@ check_misclassified_1
 
 
 ```
+
 
 
