@@ -14,10 +14,13 @@ execute:
 
 # Methods
 
+{{< include P2_methods.qmd >}}
 {{< include P3_methods.qmd >}}
+
 
 # Results
 
+{{< include P2_results.qmd >}}
 {{< include P3_results.qmd >}}
 
 # Bibliography
