@@ -91,4 +91,4 @@ If the squared Mahalanobis distance follows the $\chi^2_4$ distribution.
 
 ### Subgroup vs Aggregated Models
 
-The three species have visibly different centroids, so an unusual penguin in the context of the entire dataset, mught not actually be unusual within its own species. To avoid this we made a pooled model with overall mean and covariance, and a subgroup model using each species own mean and covariance.
+The three species have visibly different centroids, so an unusual penguin in the context of the entire dataset, might not actually be unusual within its own species. To avoid this we made a pooled model with overall mean and covariance, and a subgroup model using each species own mean and covariance.
