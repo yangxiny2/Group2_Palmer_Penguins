@@ -21,7 +21,6 @@ by(penguins_cleaned, penguins_cleaned$species, summary)
 ```
 
 ```{r}
-
 library(ggplot2)
 ggplot(penguins_cleaned, 
        aes(x = species, y = body_mass_g)) +
