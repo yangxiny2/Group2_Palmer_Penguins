@@ -353,7 +353,7 @@ boxM(chinstrap[, 3:6], chinstrap$sex) #grab by column index for measurement colu
 
 | Species | Chi-Sq (approx.) | df | p-value | Significant at α=0.05? |
 |---|---|---|---|---|
-| Adelie | 17.65 | 10 | 0.061 | No (borderline) |
+| Adelie | 17.65 | 10 | 0.061 | No |
 | Gentoo | 26.22 | 10 | 0.0035 | Yes |
 | Chinstrap | 24.46 | 10 | 0.0065 | Yes |
 
