@@ -45,7 +45,7 @@ peng_melt <- melt(
 ```{r Hist norm}
 normal_curves <- peng_melt %>%
   group_by(species, Measurement) %>%
-  summarise(
+  dplyr::summarise(
     x = list(seq(min(value), max(value), length.out = 200)),
     m = mean(value),
     s = sd(value),
@@ -127,7 +127,7 @@ ggcorrplot(
 Bill length and Bill depth show almost no correlation pooled across species. Within species, a penguin with a longer bill, will have a proportionally deeper bill. The reason the pooled correlation is as it is, is penguins with longer bills do not hava proportionally deeper bill compared to a penguin with a shorter bill. The mixing of species here has cancelled this out.
 
 ```{r}
-cleanpenguins %>% group_by(species) %>% summarise(cor(bill_length_mm, bill_depth_mm))
+cleanpenguins %>% group_by(species) %>% dplyr::summarise(cor(bill_length_mm, bill_depth_mm))
 ```
 
 ## D. Mahalanobis Distance Histogram with $\chi^2$ Cut-Points
@@ -203,9 +203,7 @@ ggplot(cleanpenguins, aes(x = dM_subgroup)) +
   ) +
   theme_minimal()
 
-# Same chi-square QQ-plot idea, but as a QQ-plot rather than a
-# histogram overlay -- easier to judge fit in the tails, which is
-# where MVN violations usually show up.
+
 qq_data <- cleanpenguins %>%
   group_by(species) %>%
   arrange(dM_subgroup, .by_group = TRUE) %>%
@@ -269,11 +267,7 @@ Looking at out Normal Q-Q Plot, we can see the the points do not lie close to th
 
 # Surprising Observations
 
-```{r}
-# Flag individual penguins using the SUBGROUP distances (dM_subgroup),
-# since these are the ones that reflect "unusual for its own species"
-# rather than "unusual overall" -- the more meaningful definition of
-# a surprising observation here.
+```{r surp obvs}
 subgroup_cutoffs <- qchisq(c(0.9, 0.95, 0.99), df = 4)
 
 cleanpenguins$surprise_subgroup <- cut(
@@ -287,7 +281,7 @@ print(table(cleanpenguins$species, cleanpenguins$surprise_subgroup))
 
 cleanpenguins %>%
   filter(surprise_subgroup == "Very") %>%
-  select(row_id, species, sex, all_of(numeric_vars), dM_subgroup) %>%
+  dplyr::select(row_id, species, sex, all_of(numeric_vars), dM_subgroup) %>%
   arrange(desc(dM_subgroup))
 ```
 
