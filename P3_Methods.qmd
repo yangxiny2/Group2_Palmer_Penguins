@@ -1,7 +1,7 @@
 
 <!--## Methods-->
 
-To answer the question, we broke it into 2 parts: 
+We split the question into 2 parts:
 
 1) Do size differences within female and male penguins in one species, cause misclassification for another species; and 
 
@@ -10,7 +10,7 @@ To answer the question, we broke it into 2 parts:
 
 ## Part 1: Sex differences within species
 
-Penguins were removed from the dataset if they had no sex recorded to ensure consistency. A row_id column was also added to help with identifying individual penguins.
+Penguins were removed from the dataset if they had no sex recorded as they were lacking critical information. A row_id column was also added to help with identifying individual penguins.
 
 
 ```{r}
@@ -27,7 +27,7 @@ palmer_penguins$sex <- as.factor(palmer_penguins$sex)
 ```
 
 
-We wanted to first perform a t-test to determine whether there was a significant difference between the mean measurements of each species, accounting for males and females. This approach follows R code demonstrated in a STAT394 lecture [@frery2026lecture].
+We wanted to first perform a t-test to determine whether there was a significant difference between the mean measurements of each species when accounting for males and females. 
 
 However, to run the t-tests required first performing an F-test to determine whether males and females within each species have equal variance. Results shown below.
 
@@ -159,7 +159,7 @@ var.test(chinstrap_m, chinstrap_f, alternative = "two.sided")
 
 
 P values greater than 0.05 indicate where variances are statistically equal.
-Based on the R code output above, Adelie body_mass_g, Gentoo bill depth, Gentoo flipper length, Gentoo body mass, Chinstrap bill length all suggest unequal variances. We then set the var.equal parameter in the t-test to FALSE for these measurements.
+Based on the R code output above, Adelie body mass, Gentoo bill depth, Gentoo flipper length, Gentoo body mass, Chinstrap bill length all suggest unequal variances. We then set the var.equal parameter in the t-test to FALSE for these measurements.
 
 
 Next we performed a t-test, following the approach shown by @frery2026lecture to check for a significant difference between the means within each species. The t-test divides the difference in sample means by the standard error. Setting equal variances to true or false hence has an effect on the calculation of the standard error and the degrees of freedom used. Results shown below.
@@ -318,8 +318,8 @@ chinstrap_hotelling
 | Chinstrap | 115.23 | 4 | 63 | 3.19e-13 |
 
 
-We then ran the Box M test next to determine if the covariance matrices (sigma) across different groups are equal. The test will check spreads and variation
-to then determine sigma overall or per species.
+We then ran the Box's M test next to determine if the covariance matrices (sigma) across different groups are equal. The test checks the spread and variation
+to then determine sigma overall for each species.
 
 
 ```{r}
@@ -357,9 +357,7 @@ boxM(chinstrap[, 3:6], chinstrap$sex) #grab by column index for measurement colu
 | Gentoo | 26.22 | 10 | 0.0035 | Yes |
 | Chinstrap | 24.46 | 10 | 0.0065 | Yes |
 
-An alpha value p=0.05 is used for this test. The null hypothesis is rejected where the p value falls below this threshold, suggesting that males and females have significantly different covariance shapes. We failed to reject the null hypothesis for Adelie but reject for Gentoo and Chinstrap. This suggests that Gentoo and Chinstrap have significant covariance structures.
-
-
+An alpha value of p=0.05 was used for this test. The null hypothesis was rejected where the p value falls below this threshold, suggesting that males and females have significantly different covariance shapes. We failed to reject the null hypothesis for Adelie but did reject the null hypothesis for Gentoo and Chinstrap. This suggests that Gentoo and Chinstrap have significant covariance structures.
 
 
 
@@ -397,9 +395,11 @@ covariance.chinstrap
 ```
 
 
-We used the Mahalanobis distance to find the distance of an individual penguin from the mean vector for the species with relation to the spread. This will show us how similar individuals seem according to each species.
+We initially considered using a chi-squared test, but as it only compares a penguin to its own species rather than to all groups, we could not accurately compare across species. Therefore, we changed the method as detailed below.
 
-Covariance is also a parameter of this, hence we performed a Box M test again to examine covariances of species to determine whether we used separate or shared covariance matrices.
+We used the Mahalanobis distance to find the distance of an individual penguin from the mean vector for the species, in relation to its covariance matrix. This shows how similar individuals seem according to each species.
+
+Since covariance is a parameter of this, we performed a Box's M test again to determine whether to use separate or shared covariance matrices.
 
 
 ```{r}
@@ -413,16 +413,18 @@ boxM(palmer_penguins[, 3:6], palmer_penguins$species)
 
 ```
 
-We initially considered using a chi-squared test but it only compares a penguin to its own species rather than to all the groups available. We changed the method as we could not accurately compare across species.
 
 ```{r}
 #| echo: true
 #| eval: true
 #| results: 'hide'
 
-d1.adelie    <- mahalanobis(palmer_penguins[, 3:6], center = mean.adelie,    cov = covariance.adelie)
-d2.gentoo    <- mahalanobis(palmer_penguins[, 3:6], center = mean.gentoo,    cov = covariance.gentoo)
-d3.chinstrap <- mahalanobis(palmer_penguins[, 3:6], center = mean.chinstrap, cov = covariance.chinstrap)
+d1.adelie    <- mahalanobis(palmer_penguins[, 3:6], center = mean.adelie,    
+                            cov = covariance.adelie)
+d2.gentoo    <- mahalanobis(palmer_penguins[, 3:6], center = mean.gentoo,    
+                            cov = covariance.gentoo)
+d3.chinstrap <- mahalanobis(palmer_penguins[, 3:6], center = mean.chinstrap, 
+                            cov = covariance.chinstrap)
 
 combined <- cbind(d1.adelie, d2.gentoo, d3.chinstrap)
 species_labels <- c("Adelie", "Gentoo", "Chinstrap")
@@ -444,10 +446,7 @@ length(misclassified)
 
 
 ```
-Here each individual penguin is compared on its measurements to the centroids of each species and finds the one with the closest distance (most similar).
-
-
-We then repeated this model, splitting each species by sex, to see if there would be any change to the misclassified penguins.
+Each penguin's measurements were compared to, and then assigned according to, the closest centroid of each species. We then repeated this model, splitting each species by sex, to see if there would be any change to the misclassified penguins.
 
 
 ```{r}
