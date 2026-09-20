@@ -5,29 +5,27 @@ Part 1: Sex difference within species
 
 F-test:
 P values greater than 0.05 indicate where variances are statistically equal.
-Based on the R code output above, Adelie body_mass_g, Gentoo bill depth, Gentoo flipper length, Gentoo body mass, Chinstrap bill length all suggest unequal variances.
-
+Our results suggest that Adelie body mass, Gentoo bill depth, Gentoo flipper length, Gentoo body mass, and Chinstrap bill length have unequal variances.
 
 t-test:
-Based on the R output, we can see the p values for the t-test for all measurements within each species satisfy p <0.05. This suggests that all of these measurements are statistically significant for male vs female means.
+Based on the R output, all measurements within each species satisfy p < 0.05. This suggests that differences in male and female measurements are statistically significant.
 
 Hotelling's T^2 test:
-Small p values here indicate that males and females within-species are meaningfully different (Adelie: p ≈ 0; Gentoo: p ≈ 0; Chinstrap: p = 3.191 × 10⁻¹³) when measurements are considered together and that these differences are unlikely to have occurred by chance.
+Small p values here indicate that males and females from each species are significantly different when measurements are considered together (Adelie: p ≈ 0, Gentoo: p ≈ 0, Chinstrap: p = 3.191 × 10⁻¹³) - and that these differences are unlikely to have occurred randomly.
 
 Box's M test:
-An alpha value p=0.05 is used for this test. The null hypothesis is rejected where the p value falls below this threshold, suggesting that males and females have significantly different covariance shapes. We failed to reject the null hypothesis for Adelie but reject for Gentoo and Chinstrap. This suggests that Gentoo and Chinstrap have significant covariances.
+An alpha value of p = 0.05 was used for this test. Where the p-value fell below this threshold, it suggests that males and females had significantly different covariance shapes. We found that males and females are more similar to each other in the Adelie species (p = 0.061) than within Gentoo (p = 0.0035) or Chinstrap (p = 0.0065). 
 
-This suggests that males and females within-species not only differ in average measurements (from t-test and Hotelling's T^2) but also their covariance shape. On the other hand, Adelie penguins have a more similar covariance shape between males and females.
-
+Overall, results show that males and females within-species differ not only in average measurements but also in covariance structure.
 
 Part 2:
 Classification with and without sex
 
-Box's M Test: Returned p-value = 3.02e-08, showing that there is a statistically significant difference in covariance structures between the three species.
+Box's M Test: showed a p-value = 3.02e-08, showing there is a statistically significant difference in the covariance structures of the three species. This confirmed the use of separate covariance matrices when calculating the Mahalanobis distance for each species.
 
-Classification without sex: 4 penguins misclassified. Row IDs 68, 124, 286, 296
+Classification without sex: 4 penguins misclassified - row IDs 68, 124, 286, 296.
 
-Classification with sex: 1 penguin misclassified. Row ID 274. 
+Classification with sex: 1 penguin misclassified - row ID 274. 
 
 The table below summarises measurements for the five misclassified penguins.
 
@@ -55,7 +53,7 @@ filtered_misclassified_sex_df_final
 | 296 | Chinstrap | female | 40.9 | 16.6 | 187 | 3200 |
 | 274 | Chinstrap | female | 46.0 | 18.9 | 195 | 4150 |
 
-Four penguins (larger males and smaller females) are no longer misclassified by adding sex into the model. However, one new penguin becomes misclassified.
+The four penguins (larger males and smaller females) are no longer misclassified by adding sex into the model. However, one new penguin (large female) becomes misclassified.
  
 There were no penguins misclassified under both models.
  
