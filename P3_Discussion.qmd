@@ -8,7 +8,7 @@ Our Box's M results, showing significant covariance differences by sex in Chinst
 
 The normality assessment described at the start of the Methods section (the univariate QQ-plots, parametric curve fitting, and multivariate checks via Mahalanobis distances $d^2_M$) confirms that the data for each species approximate multivariate normality, therefore building the foundation for the tests used in Part 1.
 
-Our findings also show that sex has a visible and clear effect on species classification. In the model without sex distinction, penguins 68, 124, 286, and 296 were misclassified. However, in the model with sex considered, these individuals are no longer misclassified - although penguin 274 becomes misclassified.
+Our findings also show that sex has a visible and clear effect on species classification. In the model without sex distinction, penguins 68, 124, 286, and 296 were misclassified. However, in the model with sex considered, these individuals are no longer misclassified - although penguin 274 becomes misclassified. We note that the individuals we have identified here are not outliers in the traditional sense (as identified in the multivariate normaly assessment) but rather penguins who appear unusually large or small for their sex and species, causing misclassificaton.
 
 Adelie males ID 68 and ID 124 seem to have longer bill lengths and flipper lengths. Based on the 3 centroids of Adelie, Gentoo and Chinstrap in the first model, these individuals seem to be larger and closer to the Chinstrap centroid due to the combined Adelie centroid affected by the inclusion of smaller female Adelie measurements. However, once we split each species by sex, these individuals become correctly classified as closest to male Adelie due to the narrower and more accurate mean measurements.
 
@@ -17,6 +17,7 @@ In the original model, Chinstrap female 286 and 296 are misclassified as Adelie 
 Misclassification with our second model suggests that penguin ID 274 is a Chinstrap female that appears to be within the combined-sex Chinstrap measurement range when sex is not considered. Although most of its measurements seem to be in line with average, its body mass and bill depth are unusually large. Once sex is factored in, the measurements of penguin 274 lies closer to a male Adelie. 
 
 A limitation of our analysis is that all classification was performed using the same limited sample dataset, and therefore, our results may not be consistent if applied to a new sample from the population. We also note that the model did not account for the 11 penguins with unconfirmed sex as they were removed at the start from the dataset. To build on our findings, a possible direction for a future study would be investigating whether sex, when unknown, can be determined from body measurements.
+
 
 
 
